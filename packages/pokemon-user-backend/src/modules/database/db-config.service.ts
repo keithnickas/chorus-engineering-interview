@@ -1,19 +1,47 @@
 import { Injectable } from '@nestjs/common';
-import { TypeOrmModuleOptions } from '@nestjs/typeorm';
-import { SomeEntity } from './entities/some.entity';
+import { TypeOrmModuleOptions, TypeOrmOptionsFactory } from '@nestjs/typeorm';
+import { Pokemon } from './entities/pokemon.entity';
+import { Profile } from './entities/profile.entity';
+import { ProfilePokemon } from './entities/profile-pokemon.entity';
+
+type DbOptions = TypeOrmModuleOptions & {
+  host: string;
+  port: number;
+  username: string;
+  password: string;
+  database: string;
+};
 
 @Injectable()
-export class DbConfigService {
-  async createTypeOrmOptions(): Promise<TypeOrmModuleOptions> {
+export class DbConfigService implements TypeOrmOptionsFactory {
+  private dbOptions: DbOptions;
+
+  constructor() {
+    this.dbOptions = {
+      host: process.env.POKEMON_DB_HOST || 'localhost',
+      port: parseInt(process.env.POKEMON_DB_PORT || '5432', 10),
+      username: process.env.POKEMON_DB_USERNAME || 'postgres',
+      password: process.env.POKEMON_DB_PASSWORD || 'password',
+      database: process.env.POKEMON_DB_NAME || 'pokemon',
+      // Note: Set to true in development when working with entities, but false in production to avoid data loss
+      synchronize: Boolean(process.env.POKEMON_DB_ENABLE_SYNCHRONIZE) || false,
+      // Enable verbose retry logging for better visibility into connection issues, especially during development
+      verboseRetryLog: Boolean(process.env.POKEMON_DB_VERBOSE_RETRY_LOG) || false,
+    };
+
+  }
+  async createTypeOrmOptions(connectionName?: string): Promise<TypeOrmModuleOptions> {
+    const { host, port, username, password, database, synchronize, verboseRetryLog } = this.dbOptions;
     return {
       type: 'postgres',
-      host: 'localhost',
-      port: 5432,
-      username: 'admin',
-      password: 'admin',
-      database: 'pokemon',
-      entities: [SomeEntity],
-      synchronize: true,
+      host,
+      port,
+      username,
+      password,
+      database,
+      entities: [Pokemon, Profile, ProfilePokemon],
+      synchronize,
+      verboseRetryLog
     };
   }
 }
