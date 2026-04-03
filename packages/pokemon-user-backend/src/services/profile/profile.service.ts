@@ -3,6 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Profile } from '../../modules/database/entities/profile.entity';
 import { UUID } from 'crypto';
+import { CreateProfileDto } from '../../controllers/profile/dto/create-profile.dto';
 
 /**
  * Service responsible for managing user profiles, including retrieval and creation of profiles.
@@ -54,8 +55,12 @@ export class ProfileService {
    * @param body The request body containing profile details.
    * @returns The newly created Profile entity.
    */
-  async createProfile(body: { name: string; description: string; email: string }): Promise<Profile> {
-    const newProfile = this.repo.create({ name: body.name, description: body.description, email: body.email });
+  async createProfile(body: CreateProfileDto): Promise<Profile> {
+    const newProfile = this.repo.create({ 
+      name: body.name, 
+      description: body.description, 
+      email: body.email 
+    });
     return this.repo.save(newProfile);
   }
 }
