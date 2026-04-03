@@ -4,6 +4,7 @@ import { fileURLToPath } from 'url';
 import yaml from 'js-yaml';
 import pkg from 'pg';
 import { randomUUID } from 'node:crypto';
+
 const { Client } = pkg;
 
 type PokemonYamlEntry = {
@@ -41,6 +42,7 @@ type PokemonYamlEntry = {
     spdefense?: number;
     speed?: number;
   };
+  spriteUrl?: string;
 };
 
 const __filename = fileURLToPath(import.meta.url);
@@ -101,6 +103,9 @@ function parseYamlFile(filePath: string) {
       friendship: entry?.friendship ?? null,
       growthRate: entry?.growthRate ?? null,
       evYield: entry?.evYield ?? null,
+      spriteUrl: entry?.national
+        ? `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/dream-world/${entry.national}.svg`
+        : null,
     };
   });
 }
@@ -130,7 +135,7 @@ async function seed_pokemon_data() {
         (form) => form.pokemonid?.toLowerCase() === pokemon.name?.toLowerCase()
       );
       if (forms.length > 0) {
-        return Object.assign({}, { ...pokemon, ...forms[0] });
+        return Object.assign({}, pokemon, ...Object.entries(forms[0]).filter(([, v]) => v !== null && v !== undefined).map(([k, v]) => ({ [k]: v })));
       }
       return pokemon;
     }
@@ -170,15 +175,15 @@ async function seed_pokemon_data() {
       const values: any[] = [];
       const placeholders: string[] = [];
       chunk.forEach((r, j) => {
-        const idx = j * 20;
+        const idx = j * 21;
         placeholders.push(
-          `($${idx + 1}, $${idx + 2}, $${idx + 3}, $${idx + 4}, $${idx + 5}, $${
+          `($${idx + 1}::uuid, $${idx + 2}, $${idx + 3}, $${idx + 4}, $${idx + 5}, $${
             idx + 6
           }, $${idx + 7}, $${idx + 8}, $${idx + 9}, $${idx + 10}, $${
             idx + 11
           }, $${idx + 12}, $${idx + 13}, $${idx + 14}, $${idx + 15}, $${
             idx + 16
-          }, $${idx + 17}, $${idx + 18}, $${idx + 19}, $${idx + 20})`
+          }, $${idx + 17}, $${idx + 18}, $${idx + 19}, $${idx + 20}, $${idx + 21})`
         );
         values.push(
           r.uid,
@@ -200,11 +205,12 @@ async function seed_pokemon_data() {
           r.eggCycles,
           r.friendship,
           r.growthRate,
-          r.evYield
+          r.evYield,
+          r.spriteUrl || null
         );
       });
 
-      const sql = `INSERT INTO pokemon(uid,name,national,gen,formid,formname,release,type1,type2,stats,species,height,weight,gender,"catchRate","baseExp","eggCycles",friendship,"growthRate","evYield") VALUES ${placeholders.join(
+      const sql = `INSERT INTO pokemon(uid,name,national,gen,formid,formname,release,type1,type2,stats,species,height,weight,gender,"catchRate","baseExp","eggCycles",friendship,"growthRate","evYield","spriteUrl") VALUES ${placeholders.join(
         ', '
       )} ON CONFLICT ("uid") DO UPDATE SET "name" = EXCLUDED."name"`;
       await client.query('BEGIN');
