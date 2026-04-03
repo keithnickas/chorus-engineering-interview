@@ -3,7 +3,9 @@
   "compilerOptions": {
     "rootDir": ".",
     "sourceMap": true,
-    "declaration": false,
+    "composite": true,
+    "declaration": true,
+    "declarationMap": true,
     "moduleResolution": "node",
     "emitDecoratorMetadata": true,
     "experimentalDecorators": true,
@@ -14,7 +16,10 @@
     "skipLibCheck": true,
     "skipDefaultLibCheck": true,
     "baseUrl": ".",
-    "paths": {}
+    "paths": {
+      "@pokemon-user-backend/*": ["packages/pokemon-user-backend/src/*"],
+      "@pokemon-user-backend-e2e/*": ["packages/pokemon-user-backend-e2e/src/*"]
+    }
   },
-  "exclude": ["node_modules", "tmp"]
+  "exclude": ["node_modules", "tmp"],
 }
