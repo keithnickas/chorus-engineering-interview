@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Profile } from '../../modules/database/entities/profile.entity';
-import { UUID } from 'crypto';
+import { UUID } from 'node:crypto';
 import { CreateProfileDto } from '../../controllers/profile/dto/create-profile.dto';
 
 /**
@@ -17,7 +17,10 @@ export class ProfileService {
   ) {}
 
   findAll(): Promise<Profile[]> {
-    return this.repo.find();
+    return this.repo.find({
+      relations: ['pokemons', 'pokemons.pokemon'],
+      order: { createdAt: 'DESC' }
+    });
   }
 
   /**
@@ -28,10 +31,16 @@ export class ProfileService {
    */
   async getProfile({uid, email}: {uid?: UUID, email?: string}): Promise<Profile | null> {
     if (uid) {
-      return this.repo.findOne({ where: { uid } });
+      return this.repo.findOne({ 
+        where: { uid },
+        relations: ['pokemons', 'pokemons.pokemon']
+      });
     }
     if (email) {
-      return this.repo.findOne({ where: { email } });
+      return this.repo.findOne({ 
+        where: { email },
+        relations: ['pokemons', 'pokemons.pokemon']
+      });
     }
     return null;
   }

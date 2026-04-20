@@ -11,7 +11,7 @@ import {
 } from '@nestjs/common';
 import { ProfileService } from '../../services/profile/profile.service';
 import { ProfilePokemonService } from '../../services/profile-pokemon/profile-pokemon.service';
-import { UUID } from 'crypto';
+import { UUID } from 'node:crypto';
 import { Profile } from '../../modules/database/entities/profile.entity';
 import { CreateProfileDto } from './dto/create-profile.dto';
 import { AddToTeamDto } from './dto/add-to-team.dto';
@@ -108,30 +108,30 @@ export class ProfileController {
     @Param('uid') uid: UUID,
     @Body() body: AddToTeamDto
   ): Promise<ProfilePokemon> {
-    if (!body || !body.pokemonUid) {
-      throw new BadRequestException('Pokemon UID is required');
+    if (!body || !body.pokemonId) {
+      throw new BadRequestException('Pokemon ID is required');
     }
-    return this.profilePokemonService.addToTeam(uid, body.pokemonUid);
+    return this.profilePokemonService.addToTeam(uid, body.pokemonId);
   }
 
   /**
    * Removes a Pokémon from a user's team.
    * @param uid The UUID of the user's profile.
-   * @param pokemonUid The UUID of the Pokémon to remove.
+   * @param pokemonId The UUID of the Pokémon to remove.
    * @returns A message indicating the result of the removal.
    */
-  @Delete('/:uid/team/:pokemonUid')
+  @Delete('/:uid/team/:pokemonId')
   async removeFromTeam(
     @Param('uid') uid: UUID,
-    @Param('pokemonUid') pokemonUid: UUID
+    @Param('pokemonId') pokemonId: UUID
   ): Promise<void> {
-    if (!pokemonUid) {
-      throw new BadRequestException('Pokemon UID is required');
+    if (!pokemonId) {
+      throw new BadRequestException('Pokemon ID is required');
     }
     if (!uid) {
       throw new BadRequestException('Profile UID is required');
     }
 
-    return this.profilePokemonService.removeFromTeam(uid, pokemonUid);
+    return this.profilePokemonService.removeFromTeam(uid, pokemonId);
   }
 }

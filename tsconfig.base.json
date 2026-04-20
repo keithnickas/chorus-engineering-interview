@@ -1,11 +1,10 @@
 {
   "compileOnSave": false,
   "compilerOptions": {
-    "rootDir": ".",
+    "rootDir": "./",
     "sourceMap": true,
     "composite": true,
     "declaration": true,
-    "declarationMap": true,
     "moduleResolution": "node",
     "emitDecoratorMetadata": true,
     "experimentalDecorators": true,
@@ -15,10 +14,11 @@
     "lib": ["es2020", "dom"],
     "skipLibCheck": true,
     "skipDefaultLibCheck": true,
-    "baseUrl": ".",
+    "rootDirs": ["./"],
     "paths": {
-      "@pokemon-user-backend/*": ["packages/pokemon-user-backend/src/*"],
-      "@pokemon-user-backend-e2e/*": ["packages/pokemon-user-backend-e2e/src/*"]
+      "@pokemon-user-backend/*": ["./packages/pokemon-user-backend/src/*"],
+      "@pokemon-user-backend-e2e/*": ["./packages/pokemon-user-backend-e2e/src/*"],
+      "@pokemon-ui/*": ["./packages/pokemon-ui/src/*"]
     }
   },
   "exclude": ["node_modules", "tmp"],

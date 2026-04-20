@@ -1,6 +1,7 @@
 import { Controller, Get, Param, Query } from '@nestjs/common';
 import { PokemonService } from '../../services/pokemon/pokemon.service';
 import { Pokemon } from '../../modules/database/entities/pokemon.entity';
+import { UUID } from 'node:crypto';
 
 /**
  * The PokemonController is responsible for handling HTTP requests related to Pokémon data.
@@ -20,25 +21,35 @@ export class PokemonController {
    */
   @Get()
   async findAll(@Query() query?: Record<string, unknown>): Promise<Pokemon[]> {
-      const limitRaw = query?.limit;
-      const skipRaw = query?.skip;
-      const limitValue = Array.isArray(limitRaw) ? limitRaw[0] : limitRaw;
-      const skipValue = Array.isArray(skipRaw) ? skipRaw[0] : skipRaw;
-      const numericLimit = Number(limitValue) || 150;
-      const numericSkip = Number(skipValue) || 0;
-      return this.pokemonService.findAll({ take: numericLimit, skip: numericSkip });
+    const limitRaw = query?.limit;
+    const skipRaw = query?.skip;
+    const nameRaw = query?.name;
+
+    const limitValue = Array.isArray(limitRaw) ? limitRaw[0] : limitRaw;
+    const numericLimit = Number(limitValue) || 150;
+    const nameValue = Array.isArray(nameRaw) ? nameRaw[0] : nameRaw;
+    const nameFilter = typeof nameValue === 'string' ? nameValue : undefined;
+
+    const skipValue = Array.isArray(skipRaw) ? skipRaw[0] : skipRaw;
+    const numericSkip = Number(skipValue) || 0;
+
+    const pokemons = await this.pokemonService.findAll({
+      name: nameFilter,
+      skip: numericSkip,
+      take: numericLimit,
+    });
+
+    return pokemons;
   }
 
   /**
-   * Retrieves details of a specific Pokémon by its ID.
-   * The ID is expected to be a numeric value, and the method will attempt to convert the provided ID parameter to a number before querying the service.
-   * If the conversion fails or if the Pokémon with the specified ID does not exist, it will return null.
-   * @param id The ID of the Pokémon to retrieve, provided as a string in the URL parameter.
+   * Retrieves details of a specific Pokémon by its UUID.
+   * Uses the immutable UUID identifier instead of the numeric row ID to ensure stable external API access.
+   * @param uid The UUID of the Pokémon to retrieve, provided as a string in the URL parameter.
    * @returns A promise that resolves to the Pokémon entity if found, or null if not found.
    */
-  @Get('/:id')
-  async findOne(@Param('id') id: string): Promise<Pokemon | null> {
-    const numericId = Number(id);
-    return this.pokemonService.findOne(numericId);
+  @Get('/:uid')
+  async findOne(@Param('uid') uid: UUID): Promise<Pokemon | null> {
+    return this.pokemonService.findOneByUid(uid);
   }
 }

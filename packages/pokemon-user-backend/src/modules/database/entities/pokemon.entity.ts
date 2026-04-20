@@ -5,7 +5,7 @@ import {
   OneToMany,
 } from 'typeorm';
 import { ProfilePokemon } from './profile-pokemon.entity';
-import { UUID } from 'crypto';
+import { UUID } from 'node:crypto';
 
 @Entity()
 export class Pokemon {
@@ -13,7 +13,7 @@ export class Pokemon {
   id: number;
 
   @Column({ type: 'uuid', unique: true })
-  uid: UUID;
+  uid!: UUID;
 
   @Column()
   name: string;

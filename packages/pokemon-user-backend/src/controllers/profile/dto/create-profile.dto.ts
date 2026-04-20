@@ -1,14 +1,14 @@
 import {  IsEmail, IsNotEmpty, IsOptional, IsString, IsUUID, MaxLength, Min, MinLength } from 'class-validator';
-import { UUID } from 'crypto';
+import { UUID } from 'node:crypto';
 
 export class CreateProfileDto {
   @IsOptional()
   @IsUUID()
-  uid?: UUID;
+  uid!: UUID;
 
   @IsString()
   @MinLength(3)
-  name: string;
+  name!: string;
 
   @IsOptional()
   @IsString()
@@ -17,5 +17,5 @@ export class CreateProfileDto {
 
   @IsNotEmpty()
   @IsEmail()
-  email: string;
+  email!: string;
 }

@@ -20,8 +20,8 @@ export class DbConfigService implements TypeOrmOptionsFactory {
     this.dbOptions = {
       host: process.env.POKEMON_DB_HOST || 'localhost',
       port: parseInt(process.env.POKEMON_DB_PORT || '5432', 10),
-      username: process.env.POKEMON_DB_USERNAME || 'postgres',
-      password: process.env.POKEMON_DB_PASSWORD || 'password',
+      username: process.env.POKEMON_DB_USERNAME || 'admin',
+      password: process.env.POKEMON_DB_PASSWORD || 'admin',
       database: process.env.POKEMON_DB_NAME || 'pokemon',
       // Note: Set to true in development when working with entities, but false in production to avoid data loss
       synchronize: Boolean(process.env.POKEMON_DB_ENABLE_SYNCHRONIZE) || false,

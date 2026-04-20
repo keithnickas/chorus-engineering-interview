@@ -1,7 +1,8 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { ILike, Repository } from 'typeorm';
 import { Pokemon } from '../../modules/database/entities/pokemon.entity';
+import { UUID } from 'node:crypto';
 
 /**
  * Service responsible for managing Pokémon data, including retrieval of Pokémon lists and individual Pokémon details.
@@ -13,7 +14,7 @@ import { Pokemon } from '../../modules/database/entities/pokemon.entity';
 export class PokemonService {
   constructor(
     @InjectRepository(Pokemon)
-    private readonly repo: Repository<Pokemon>,
+    private readonly repo: Repository<Pokemon>
   ) {}
 
   /**
@@ -21,8 +22,19 @@ export class PokemonService {
    * @param params Optional parameters for pagination, including 'take' for the number of records to retrieve and 'skip' for the number of records to skip.
    * @returns A promise that resolves to an array of Pokémon entities.
    */
-  findAll(params?: { take?: number, skip?: number }): Promise<Pokemon[]> {
-    return this.repo.find({ take: params?.take, skip: params?.skip });
+  findAll(params?: {
+    take?: number;
+    skip?: number;
+    name?: string;
+  }): Promise<Pokemon[]> {
+    const where = params?.name ? { name: ILike(`%${params.name}%`) } : {};
+
+    return this.repo.find({
+      where,
+      take: params?.take,
+      skip: params?.skip,
+      order: { national: 'ASC' },
+    });
   }
 
   /**
@@ -32,5 +44,15 @@ export class PokemonService {
    */
   findOne(id: number): Promise<Pokemon | null> {
     return this.repo.findOneBy({ id });
+  }
+
+  /**
+   * Retrieves a specific Pokémon by its UUID.
+   * UUIDs are immutable and preferred for external API access.
+   * @param uid The UUID of the Pokémon to retrieve.
+   * @returns A promise that resolves to the Pokémon entity or null if not found.
+   */
+  findOneByUid(uid: string): Promise<Pokemon | null> {
+    return this.repo.findOneBy({ uid: uid as unknown as UUID });
   }
 }

@@ -10,7 +10,8 @@
       "vitest",
       "@nx/react/typings/cssmodule.d.ts",
       "@nx/react/typings/image.d.ts"
-    ]
+    ],
+    "ignoreDeprecations": "5.0"
   },
   "include": [
     "vite.config.ts",
@@ -24,5 +25,5 @@
     "src/**/*.test.jsx",
     "src/**/*.spec.jsx",
     "src/**/*.d.ts"
-  ]
+, "src/api/types/api.ts"  ]
 }

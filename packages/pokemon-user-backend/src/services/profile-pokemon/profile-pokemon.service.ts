@@ -4,7 +4,7 @@ import { FindManyOptions, Repository } from 'typeorm';
 import { ProfilePokemon } from '../../modules/database/entities/profile-pokemon.entity';
 import { Profile } from '../../modules/database/entities/profile.entity';
 import { Pokemon } from '../../modules/database/entities/pokemon.entity';
-import { UUID } from 'crypto';
+import { UUID } from 'node:crypto';
 
 /**
  * Service responsible for managing the association between user profiles and their Pokémon teams.

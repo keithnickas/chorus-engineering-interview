@@ -1,7 +1,7 @@
 import { IsUUID } from "class-validator";
-import { UUID } from "crypto";
+import { UUID } from "node:crypto";
 
 export class AddToTeamDto {
   @IsUUID()
-  pokemonUid: UUID;
+  pokemonId!: UUID;
 }
